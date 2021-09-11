@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "450291203580",
+    "project_id": "todo-reminder-f504d",
+    "storage_bucket": "todo-reminder-f504d.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:450291203580:android:eac8b08302f7178e760679",
+        "android_client_info": {
+          "package_name": "com.udacity.project4"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "450291203580-o8cef7dqfjkibc7og3brfgqa8a5p6t17.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.udacity.project4",
+            "certificate_hash": "552e0169b1c90f49680d84eefd655f3c03931a30"
+          }
+        },
+        {
+          "client_id": "450291203580-tdehvh29cq94gp8jmih603jpcffmnb7g.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD9sr9PdqpXTf05TtfNUrZnwdl3ulJxSR0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "450291203580-tdehvh29cq94gp8jmih603jpcffmnb7g.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
