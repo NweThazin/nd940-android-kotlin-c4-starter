@@ -1,13 +1,17 @@
 package com.udacity.project4
 
 import android.app.Application
+import android.view.View
+import android.widget.Toast
 import androidx.test.core.app.ActivityScenario
 import androidx.test.core.app.ApplicationProvider.getApplicationContext
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.IdlingRegistry
 import androidx.test.espresso.action.ViewActions.*
 import androidx.test.espresso.assertion.ViewAssertions.matches
+import androidx.test.espresso.matcher.RootMatchers.withDecorView
 import androidx.test.espresso.matcher.ViewMatchers.*
+import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import com.google.android.gms.maps.model.LatLng
@@ -23,8 +27,10 @@ import com.udacity.project4.util.DataBindingIdlingResource
 import com.udacity.project4.util.EspressoIdlingResource
 import com.udacity.project4.util.monitorActivity
 import kotlinx.coroutines.runBlocking
+import org.hamcrest.CoreMatchers.not
 import org.junit.After
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.koin.androidx.viewmodel.dsl.viewModel
@@ -47,6 +53,10 @@ class RemindersActivityTest :
     private val dataBindingIdlingResource = DataBindingIdlingResource()
 
     private val locationViewModel: SaveReminderViewModel by inject()
+
+    @get:Rule
+    var activityScenarioRule = ActivityScenarioRule(RemindersActivity::class.java)
+    private lateinit var decorView: View
 
     /**
      * Idling resources tell Espresso that the app is idle or busy. This is needed when operations
@@ -103,20 +113,15 @@ class RemindersActivityTest :
         runBlocking {
             repository.deleteAllReminders()
         }
+
+        activityScenarioRule.scenario.onActivity { activity ->
+            decorView = activity.window.decorView
+        }
     }
 
     @Test
     fun addingReminder_showAddedReminder() {
         runBlocking {
-            val reminder = ReminderDTO(
-                "Title1",
-                "Description1",
-                "Deyi Secondary School",
-                1.3663,
-                103.8527
-            )
-            repository.saveReminder(reminder)
-
             val poi = PointOfInterest(
                 LatLng(1.3663111405929946, 103.85272309184074),
                 "ChIJAAAAAAAAAAARUqtA0s38gk0",
@@ -152,7 +157,82 @@ class RemindersActivityTest :
 
             activityScenario.close()
         }
+    }
 
+    @Test
+    fun addReminder_showEmptyTitleErrorMessage() {
+        runBlocking {
+            val activityScenario = ActivityScenario.launch(RemindersActivity::class.java)
+            dataBindingIdlingResource.monitorActivity(activityScenario)
 
+            onView(withId(R.id.addReminderFAB)).perform(click())
+            onView(withId(R.id.reminderDescription)).perform(
+                typeText("Description1"),
+                closeSoftKeyboard()
+            )
+            onView(withId(R.id.saveReminder)).perform(click())
+
+            onView(withText(R.string.err_enter_title))
+                .inRoot(
+                    withDecorView(not(decorView))
+                )
+                .check(matches(isDisplayed()))
+
+            activityScenario.close()
+        }
+    }
+
+    @Test
+    fun addReminder_showEmptyLocationErrorMessage() {
+        runBlocking {
+            val activityScenario = ActivityScenario.launch(RemindersActivity::class.java)
+            dataBindingIdlingResource.monitorActivity(activityScenario)
+
+            onView(withId(R.id.addReminderFAB)).perform(click())
+            onView(withId(R.id.reminderTitle)).perform(
+                typeText("Title1"),
+                closeSoftKeyboard()
+            )
+            onView(withId(R.id.reminderDescription)).perform(
+                typeText("Description1"),
+                closeSoftKeyboard()
+            )
+            onView(withId(R.id.saveReminder)).perform(click())
+
+            onView(withText(R.string.err_select_location))
+                .inRoot(
+                    withDecorView(not(decorView))
+                )
+                .check(matches(isDisplayed()))
+
+            activityScenario.close()
+        }
+    }
+
+    @Test
+    fun addReminder_showSelectPOIErrorMessage() {
+        runBlocking {
+            val activityScenario = ActivityScenario.launch(RemindersActivity::class.java)
+            dataBindingIdlingResource.monitorActivity(activityScenario)
+
+            onView(withId(R.id.addReminderFAB)).perform(click())
+            onView(withId(R.id.reminderTitle)).perform(
+                typeText("Title1"),
+                closeSoftKeyboard()
+            )
+            onView(withId(R.id.reminderDescription)).perform(
+                typeText("Description1"),
+                closeSoftKeyboard()
+            )
+            onView(withId(R.id.selectLocation)).perform(click())
+            onView(withId(R.id.btn_save)).perform(click())
+            onView(withText(R.string.select_poi))
+                .inRoot(
+                    withDecorView(not(decorView))
+                )
+                .check(matches(isDisplayed()))
+
+            activityScenario.close()
+        }
     }
 }
