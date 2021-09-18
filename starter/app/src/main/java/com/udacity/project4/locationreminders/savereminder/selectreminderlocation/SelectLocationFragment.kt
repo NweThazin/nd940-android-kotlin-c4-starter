@@ -48,7 +48,7 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
     private var latitude: Double = 0.0
     private var longitude: Double = 0.0
 
-    private lateinit var pointOfInterest: PointOfInterest
+//    lateinit var pointOfInterest: PointOfInterest
 
     companion object {
         private val TAG = SelectLocationFragment::class.java.simpleName
@@ -84,15 +84,17 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
          * send back the selected location details to the view model
          * and navigate back to the previous fragment to save the reminder and add the geofence
          * **/
-        if (this::pointOfInterest.isInitialized) {
-            _viewModel.latitude.value = pointOfInterest.latLng.latitude
-            _viewModel.longitude.value = pointOfInterest.latLng.longitude
-            _viewModel.reminderSelectedLocationStr.value = pointOfInterest.name
-            _viewModel.selectedPOI.value = pointOfInterest
-            _viewModel.navigationCommand.value =
-                NavigationCommand.To(SelectLocationFragmentDirections.actionSelectLocationFragmentToSaveReminderFragment())
+        if (_viewModel.pointOfInterest != null) {
+            _viewModel.pointOfInterest?.let {
+                _viewModel.latitude.value = it.latLng.latitude
+                _viewModel.longitude.value = it.latLng.longitude
+                _viewModel.reminderSelectedLocationStr.value = it.name
+                _viewModel.selectedPOI.value = it
+                _viewModel.navigationCommand.value =
+                    NavigationCommand.Back
+            }
         } else {
-            Toast.makeText(context, "Please select point of interest!", Toast.LENGTH_LONG).show()
+            Toast.makeText(context, R.string.select_poi, Toast.LENGTH_LONG).show()
         }
     }
 
@@ -159,7 +161,7 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
     private fun setPOIClick(map: GoogleMap) {
         map.setOnPoiClickListener { poi ->
             map.clear()
-            pointOfInterest = poi
+            _viewModel.pointOfInterest = poi
             val poiMarker = map.addMarker(
                 MarkerOptions().position(poi.latLng)
                     .title(poi.name)
