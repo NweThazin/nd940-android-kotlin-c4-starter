@@ -41,9 +41,11 @@ class ReminderDescriptionActivity : AppCompatActivity() {
         if (intent.hasExtra(EXTRA_ReminderDataItem)) {
             val reminder = intent.getSerializableExtra(EXTRA_ReminderDataItem) as ReminderDataItem
             binding.reminderDataItem = reminder
+            binding.executePendingBindings()
         } else {
             val reminder = args.reminderItem
             binding.reminderDataItem = reminder
+            binding.executePendingBindings()
         }
     }
 }

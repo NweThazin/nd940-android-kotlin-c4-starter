@@ -79,6 +79,30 @@ class RemindersListViewModelTest {
         assertThat(viewModel.showNoData.getOrAwaitValue(), `is`(true))
     }
 
+    @Test
+    fun loadReminder_shouldErrorReturn() = runBlockingTest {
+        dataSource.setShouldReturnError(true)
+
+        viewModel.loadReminders()
+
+        val errorMessage = viewModel.showSnackBar.getOrAwaitValue()
+        assertThat(errorMessage, `is`("GetReminders Exception"))
+    }
+
+    @Test
+    fun loadReminder_checkLoading() = runBlockingTest {
+        mainCoroutineRule.pauseDispatcher()
+        viewModel.loadReminders()
+
+        val isLoading = viewModel.showLoading.getOrAwaitValue()
+        assertThat(isLoading, `is`(true))
+
+        mainCoroutineRule.resumeDispatcher()
+
+        val isStillLoading = viewModel.showLoading.getOrAwaitValue()
+        assertThat(isStillLoading, `is`(false))
+    }
+
     @After
     fun tearDown() {
         stopKoin()
